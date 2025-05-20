@@ -24,6 +24,10 @@ public class Estante {
     public static void deletarLivro(String nomeDoLivro) {
         estante.removeIf(livro -> livro.getNome().equalsIgnoreCase(nomeDoLivro));
     }
+    
+    public static void deletarLivroPorIndex(int index){
+        estante.remove(index);
+    }
 
     public static Livro encontrarLivro(String nomeDoLivro) {
         for (Livro livro : estante) {
