@@ -3,6 +3,8 @@ package view;
 import java.awt.CardLayout;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import model.Estante;
 import model.Livro;
 
@@ -13,6 +15,66 @@ public class Biblioteca extends javax.swing.JFrame {
     public Biblioteca() {
         initComponents();
         card = (CardLayout) this.parentPanel.getLayout();
+    }
+
+    private void atualizarTabelaLivrosDisponiveis() {
+        String[] colunas = {"Nome", "Autor ", "Ano"};
+        List<Livro> disponiveis = Estante.encontrarLivrosDisponiveis();
+
+        String[][] dados = new String[disponiveis.size()][3];
+
+        for (int i = 0; i < disponiveis.size(); i++) {
+            Livro livro = disponiveis.get(i);
+            dados[i][0] = livro.getNome();
+            dados[i][1] = livro.getAutor();
+            dados[i][2] = livro.getAnoDeLancamento();
+        }
+
+        jTableLivrosDisponiveis.setModel(new javax.swing.table.DefaultTableModel(dados, colunas));
+    }
+
+    private void atualizarTabelaLivrosDelete() {
+        String[] colunas = {"Nome", "Autor", "Ano", "Status"};
+        List<Livro> livros = Estante.todosLivros();
+
+        String[][] dados = new String[livros.size()][4];
+
+        for (int i = 0; i < livros.size(); i++) {
+            Livro livro = livros.get(i);
+            dados[i][0] = livro.getNome();
+            dados[i][1] = livro.getAutor();
+            dados[i][2] = livro.getAnoDeLancamento();
+            dados[i][3] = livro.getStatus().toString();
+        }
+
+        jTableLivrosDelete.setModel(new javax.swing.table.DefaultTableModel(dados, colunas));
+
+    }
+
+    private void procurarLivrosPorNomeParcial(String nome) {
+        if (!nome.isEmpty()) {
+            List<Livro> livrosEncontrados = Estante.buscarLivrosPorNomeParcial(nome);
+
+            String[] colunas = {"Nome", "Autor", "Ano", "Status"};
+            String[][] dados = new String[livrosEncontrados.size()][4];
+
+            for (int i = 0; i < livrosEncontrados.size(); i++) {
+                Livro livro = livrosEncontrados.get(i);
+                dados[i][0] = livro.getNome();
+                dados[i][1] = livro.getAutor();
+                dados[i][2] = livro.getAnoDeLancamento();
+                dados[i][3] = livro.getStatus().toString();
+            }
+
+            jTable1.setModel(new javax.swing.table.DefaultTableModel(dados, colunas));
+        } else {
+            JOptionPane.showMessageDialog(this, "Digite algo para buscar");
+        }
+    }
+
+    private void limparTabela(JTable tabela) {
+        DefaultTableModel model = new DefaultTableModel();
+        tabela.setModel(model);
     }
 
     @SuppressWarnings("unchecked")
@@ -572,40 +634,6 @@ public class Biblioteca extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_btnSairActionPerformed
 
-    private void atualizarTabelaLivrosDisponiveis() {
-        String[] colunas = {"Nome", "Autor ", "Ano"};
-        List<Livro> disponiveis = Estante.encontrarLivrosDisponiveis();
-
-        String[][] dados = new String[disponiveis.size()][3];
-
-        for (int i = 0; i < disponiveis.size(); i++) {
-            Livro livro = disponiveis.get(i);
-            dados[i][0] = livro.getNome();
-            dados[i][1] = livro.getAutor();
-            dados[i][2] = livro.getAnoDeLancamento();
-        }
-
-        jTableLivrosDisponiveis.setModel(new javax.swing.table.DefaultTableModel(dados, colunas));
-    }
-
-    private void atualizarTabelaLivrosDelete() {
-        String[] colunas = {"Nome", "Autor", "Ano", "Status"};
-        List<Livro> livros = Estante.todosLivros();
-
-        String[][] dados = new String[livros.size()][4];
-
-        for (int i = 0; i < livros.size(); i++) {
-            Livro livro = livros.get(i);
-            dados[i][0] = livro.getNome();
-            dados[i][1] = livro.getAutor();
-            dados[i][2] = livro.getAnoDeLancamento();
-            dados[i][3] = livro.getStatus().toString();
-        }
-
-        jTableLivrosDelete.setModel(new javax.swing.table.DefaultTableModel(dados, colunas));
-
-    }
-
 
     private void btnCadastrarLivroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarLivroActionPerformed
         String nome = txtNomeDoLivro.getText();
@@ -639,27 +667,7 @@ public class Biblioteca extends javax.swing.JFrame {
     private void btnProcurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcurarActionPerformed
         String nome = txtProcuraLivro.getText().trim();
 
-        if (!nome.isEmpty()) {
-            List<Livro> livrosEncontrados = Estante.buscarLivrosPorNomeParcial(nome);
-
-            String[] colunas = {"Nome", "Autor", "Ano", "Status"};
-            String[][] dados = new String[livrosEncontrados.size()][4];
-
-            for (int i = 0; i < livrosEncontrados.size(); i++) {
-                
-                Livro livro = livrosEncontrados.get(i);
-                dados[i][0] = livro.getNome();
-                dados[i][1] = livro.getAutor();
-                dados[i][2] = livro.getAnoDeLancamento();
-                dados[i][3] = livro.getStatus().toString();
-            }
-            
-            jTable1.setModel(new javax.swing.table.DefaultTableModel(dados, colunas));
-
-        } else {
-            JOptionPane.showMessageDialog(this, "Digite algo para buscar");
-        }
-
+        procurarLivrosPorNomeParcial(nome);
 
     }//GEN-LAST:event_btnProcurarActionPerformed
 
@@ -668,7 +676,8 @@ public class Biblioteca extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEncontrarActionPerformed
 
     private void btnVoltarPanelProcurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarPanelProcurarActionPerformed
-        card.show(parentPanel, "cardMenu");
+        card.show(parentPanel, "cardMenu");        
+        limparTabela(jTable1);
     }//GEN-LAST:event_btnVoltarPanelProcurarActionPerformed
 
     private void btnProcurarDispActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcurarDispActionPerformed
